@@ -21,7 +21,7 @@ const pie = d3.pie().value(function(d) {
   return d.minutes
 })
 
-const radius = 100
+const radius = 120
 
 const arc = d3
   .arc()
@@ -30,10 +30,11 @@ const arc = d3
 
 const labelArc = d3
   .arc()
-  .innerRadius(0)
-  .outerRadius(radius)
+  .innerRadius(radius + 5)
+  .outerRadius(radius + 5)
+//   .startAngle(d => angleScale(d))
+//   .endAngle(d => angleScale(d) + angleScale.bandwidth())
 
-const angleScale = d3.scaleBand().range([0, Math.PI * 2])
 const colorScale = d3.scaleOrdinal().range(['#7fc97f', '#beaed4', '#fdc086'])
 
 d3.csv(require('/data/time-breakdown.csv'))
@@ -42,10 +43,7 @@ d3.csv(require('/data/time-breakdown.csv'))
 
 function ready(datapoints) {
   console.log(pie(datapoints))
-
-  const minutes = datapoints.map(d => d.minutes)
-
-  angleScale.domain(minutes)
+  console.log(arc.centroid(datapoints[0]))
 
   svg
     .selectAll('path')
@@ -57,14 +55,15 @@ function ready(datapoints) {
 
   svg
     .selectAll('.outside-label')
-    .data(datapoints)
+    .data(pie(datapoints))
     .enter()
     .append('text')
-    .text(d => d.task)
+    .attr('d', d => labelArc(d))
+    .text(d => d.data.task)
     // .attr('y', -radius) // set it up at the top of the chart
     // .attr('dy', -10) // give a little offset to push it higher
     .attr('text-anchor', function(d) {
-      if (angleScale(d.minutes) > Math.PI) {
+      if (d.startAngle > Math.PI) {
         return 'end'
       } else {
         return 'start'
@@ -72,6 +71,6 @@ function ready(datapoints) {
     })
     .attr('alignment-baseline', 'middle')
     .attr('transform', function(d) {
-      return `translate(${labelArc.centroid(d.minutes)})`
+      return `translate(${labelArc.centroid(d)})`
     })
 }
