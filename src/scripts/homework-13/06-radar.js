@@ -77,12 +77,6 @@ function ready(datapoints) {
     .attr('x2', 0)
     .attr('y2', -radius)
     .attr('stroke', 'lightgrey')
-    // .style/css knows about radians
-    // .style('transform', function(d) {
-    //   console.log(d, angleScale(d))
-    //   return `rotate(${angleScale(d)}rad)`
-    // })
-    // for .attr you need to convert to degrees
     .attr('transform', function(d) {
       return `rotate(${(angleScale(d) * 180) / Math.PI})`
     })
